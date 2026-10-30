@@ -35,7 +35,7 @@ class WelcomeScreen extends StatelessWidget {
 
     // Mensaje motivacional
     const motivationalMessage =
-        '¡Organiza tus tareas, alcanza tus metas y convierte en lider!';
+        '¡Organiza tus tareas, alcanza tus metas y convierte en un gran lider!';
 
     return Scaffold(
       appBar: AppBar(
