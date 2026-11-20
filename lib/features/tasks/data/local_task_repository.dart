@@ -46,12 +46,16 @@ class LocalTaskRepository implements TaskRepository {
   ];
 
   @override
-  List<Task> getTasks() => List.unmodifiable(_tasks);
+  Future<List<Task>> getTasks() async {
+    return List.unmodifiable(_tasks);
+  }
 
   @override
   void save(Task task) {
     final index = _tasks.indexWhere((item) => item.id == task.id);
+
     if (index == -1) return;
+
     _tasks[index] = task;
   }
 }
