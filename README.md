@@ -1,135 +1,164 @@
+# TaskFlow – Aplicación de gestión de tareas
 
-# TaskFlow
+## 1. Descripción del proyecto
 
-Aplicación móvil desarrollada con Flutter para organizar actividades académicas, administrar tareas y controlar su estado de cumplimiento.
+TaskFlow es una aplicación móvil desarrollada con Flutter que permite visualizar, consultar y administrar tareas mediante una API REST. El proyecto utiliza una arquitectura MVVM para separar la lógica de presentación, los datos y el modelo de dominio.
 
-## Getting Started
+En esta sesión se implementó el consumo de una API REST utilizando Dio para obtener tareas desde un servidor externo.
 
-This project is a starting point for a Flutter application.
+## 2. Objetivos
 
-A few resources to get you started if this is your first Flutter project:
+- Consumir información desde una API REST.
+- Implementar peticiones HTTP utilizando Dio.
+- Aplicar la arquitectura MVVM.
+- Gestionar estados de carga y errores.
+- Mostrar una lista de tareas obtenidas desde internet.
+- Implementar navegación hacia el detalle de cada tarea.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
----
-
-## Alcance de TaskFlow
-
-### Descripción del proyecto
-
-**Problema:** Los estudiantes necesitan organizar sus actividades académicas y conocer cuáles están pendientes y cuáles han sido completadas.
-
-**Usuario objetivo:** Estudiantes universitarios que necesitan planificar sus actividades, trabajos y entregas semanales.
-
-**Objetivo:** Desarrollar una aplicación móvil que permita organizar y consultar tareas académicas.
-
-### Historias de usuario y criterios de aceptación
-
-1. Como estudiante, quiero listar mis tareas para ver qué debo hacer.
-
-   **Criterio:** La lista muestra título, prioridad y estado de cada tarea.
-
-2. Como estudiante, quiero abrir una tarea para leer su descripción.
-
-   **Criterio:** Al tocar una tarjeta aparece el detalle de la tarea elegida.
-
-3. Como estudiante, quiero crear una tarea para registrar un pendiente.
-
-   **Criterio:** El formulario guarda una tarea válida y la lista la muestra.
-
-4. Como estudiante, quiero editar una tarea para corregir sus datos.
-
-   **Criterio:** Los cambios guardados aparecen en lista y detalle.
-
-5. Como estudiante, quiero eliminar una tarea terminada para limpiar la lista.
-
-   **Criterio:** Después de confirmar, la tarea desaparece de la lista.
-
-### Modelo de datos
-
-Task:
-- id: entero único.
-- title: texto con el nombre de la tarea.
-- description: texto con la descripción.
-- priority: Alta, Media o Baja.
-- isCompleted: verdadero o falso.
-- userId: entero que identifica al usuario de prueba.
-
-### Datos de prueba
-
-1. Configurar entorno de desarrollo.
-2. Diseñar pantalla de bienvenida.
-3. Crear componente TaskCard.
-4. Implementar listado de tareas.
-5. Ejecutar control de calidad.
-
-Todas las tareas están asociadas al usuario de prueba con identificador 1.
-
-### Pantallas previstas
-
-**Lista:**
-- Mostrar tarjetas de tareas.
-- Visualizar título, prioridad y estado.
-- Mostrar total de tareas, completadas y pendientes.
-- Permitir seleccionar una tarea.
-- Incorporar una acción para crear tareas.
-
-**Detalle:**
-- Mostrar información completa de la tarea.
-- Mostrar identificador y usuario asociado.
-- Permitir regresar al listado.
-- Incorporar futuras acciones para editar o eliminar.
-
-**Formulario:**
-- Campo para título.
-- Campo para descripción.
-- Selector de prioridad.
-- Validación de datos.
-
-### Requisitos no funcionales
-
-- La navegación debe tener textos comprensibles.
-- La interfaz debe ser sencilla y fácil de utilizar.
-- La aplicación debe funcionar en dispositivos Android.
-- Un ID inexistente debe mostrar un mensaje en vez de cerrar la aplicación.
-- El código debe estar organizado y utilizar componentes reutilizables.
-
-### Contrato de API que necesitaremos
-
-| Método | Endpoint | Operación |
-|---|---|---|
-| GET | /tasks | Listar tareas |
-| GET | /tasks/:id | Consultar detalle |
-| POST | /tasks | Crear tarea |
-| PATCH | /tasks/:id | Modificar tarea |
-| DELETE | /tasks/:id | Eliminar tarea |
-
-**Nota:** Estos endpoints son requisitos para una futura API. Actualmente TaskFlow utiliza datos locales de prueba y todavía no está conectado a un servidor.
-
-### Tecnologías utilizadas
+## 3. Tecnologías utilizadas
 
 - Flutter.
 - Dart.
-- Material Design 3.
-- Visual Studio Code.
-- Navigator.
-- Git y GitHub.
+- Dio: cliente HTTP para consumir la API.
+- Provider: gestión de estados.
+- GoRouter: navegación entre pantallas.
+- JSONPlaceholder: servicio de API REST.
+- Android Studio / Visual Studio Code.
 
-### Estado actual del proyecto
+## 4. API REST utilizada
 
-- [x] Modelo Task.
-- [x] Cinco tareas de prueba.
-- [x] Componente TaskCard.
-- [x] Listado con ListView.builder.
-- [x] Navegación entre lista y detalle.
-- [x] Identificación de usuario mediante userId.
-- [ ] Crear tareas.
-- [ ] Editar tareas.
-- [ ] Eliminar tareas.
-- [ ] Conectar con una API.
+Se utilizó JSONPlaceholder como fuente de datos de prueba.
+
+**URL del servicio:**
+
+https://jsonplaceholder.typicode.com/todos?userId=1
+
+**Método HTTP:** GET.
+
+La API devuelve 20 tareas correspondientes al usuario con ID 1.
+
+Los datos recibidos incluyen:
+
+- userId: identificador del usuario.
+- id: identificador de la tarea.
+- title: título de la tarea.
+- completed: estado de finalización.
+
+Los campos de descripción y prioridad se completan con valores predeterminados porque no están incluidos en esta API.
+
+## 5. Arquitectura del proyecto
+
+El proyecto utiliza el patrón arquitectónico MVVM:
+
+- Model: representa los datos de las tareas mediante la clase Task.
+- View: presenta la información en las pantallas de listado y detalle.
+- ViewModel: administra el estado, la carga de tareas y las acciones del usuario.
+- Repository: abstrae el origen de los datos.
+- API Service: realiza las peticiones HTTP al servidor.
+
+## 6. Estructura de carpetas
+
+```text
+lib/
+├── main.dart
+├── app/
+│   └── taskflow_app.dart
+├── core/
+│   └── app_theme.dart
+└── features/
+    └── tasks/
+        ├── data/
+        │   ├── local_task_repository.dart
+        │   ├── remote_task_repository.dart
+        │   ├── task_api_service.dart
+        │   └── task_repository.dart
+        ├── domain/
+        │   └── task.dart
+        └── presentation/
+            ├── task_detail_screen.dart
+            ├── task_list_screen.dart
+            └── tasks_view_model.dart
+```
+
+## 7. Funcionalidades implementadas
+
+1. Consulta de tareas desde una API REST.
+2. Visualización de las tareas recibidas.
+3. Indicador de carga durante la petición.
+4. Manejo de errores de conexión.
+5. Botón para reintentar la carga.
+6. Navegación desde el listado hacia el detalle.
+7. Visualización de los datos de cada tarea.
+8. Cambio del estado de una tarea entre completada y pendiente.
+
+**Nota:** Los cambios de estado se mantienen en memoria durante la ejecución de la aplicación. JSONPlaceholder no almacena las modificaciones realizadas por esta aplicación.
+
+## 8. Configuración y ejecución
+
+### Requisitos
+
+- Flutter instalado.
+- Dart instalado.
+- Android Studio o Visual Studio Code.
+- Dispositivo Android o emulador.
+
+### Instalar dependencias
+
+```bash
+flutter pub get
+```
+
+### Analizar el proyecto
+
+```bash
+flutter analyze
+```
+
+### Ejecutar la aplicación
+
+```bash
+flutter run
+```
+
+## 9. Permiso de conexión a internet
+
+Para permitir que la aplicación realice peticiones HTTP, se agregó el siguiente permiso en `android/app/src/main/AndroidManifest.xml`, antes de la etiqueta `<application>`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+## 10. Pruebas realizadas
+
+Se realizaron las siguientes comprobaciones:
+
+- Instalación de dependencias mediante `flutter pub get`.
+- Formateo del código con `dart format`.
+- Análisis estático mediante `flutter analyze`.
+- Compilación e instalación en un dispositivo Android Infinix X6531.
+- Consulta de la API REST.
+- Verificación de respuesta HTTP 200.
+- Comprobación de la navegación entre listado y detalle.
+
+**Resultado de la conexión:**
+
+```text
+GET /todos?userId=1 → HTTP 200
+```
+
+La API respondió correctamente y la aplicación pudo conectarse al servicio remoto.
+
+## 11. Conclusión
+
+Durante el desarrollo de esta sesión se implementó el consumo de una API REST en Flutter utilizando Dio. Se integró la obtención de tareas con la arquitectura MVVM y Provider, permitiendo administrar los estados de carga, error y visualización de información.
+
+También se implementó la navegación entre el listado de tareas y sus detalles mediante GoRouter.
+
+Esta práctica permitió comprender cómo conectar una aplicación móvil con servicios web externos y organizar el código mediante una arquitectura escalable y mantenible.
+
+## 12. Autor
+
+**Proyecto:** TaskFlow  
+**Desarrollador:** Eduardo García Flores  
+**Asignatura:** Desarrollo de aplicaciones móviles  
+**Repositorio:** https://github.com/eagf123/taskflow
