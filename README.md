@@ -1,164 +1,163 @@
-# TaskFlow – Aplicación de gestión de tareas
+# TaskFlow – Gestión de Tareas
 
-## 1. Descripción del proyecto
+## Descripción del proyecto
 
-TaskFlow es una aplicación móvil desarrollada con Flutter que permite visualizar, consultar y administrar tareas mediante una API REST. El proyecto utiliza una arquitectura MVVM para separar la lógica de presentación, los datos y el modelo de dominio.
+TaskFlow es una aplicación móvil desarrollada con Flutter que permite consultar y visualizar tareas mediante una API REST. La aplicación utiliza una arquitectura organizada en Service, Repository, ViewModel y View para separar las responsabilidades y facilitar el mantenimiento del código.
 
-En esta sesión se implementó el consumo de una API REST utilizando Dio para obtener tareas desde un servidor externo.
+En esta sesión se implementaron los estados de carga, éxito, vacío y error, además de la funcionalidad para reintentar una consulta cuando ocurre un problema de conexión.
 
-## 2. Objetivos
+## Tecnologías utilizadas
 
-- Consumir información desde una API REST.
-- Implementar peticiones HTTP utilizando Dio.
-- Aplicar la arquitectura MVVM.
-- Gestionar estados de carga y errores.
-- Mostrar una lista de tareas obtenidas desde internet.
-- Implementar navegación hacia el detalle de cada tarea.
+- Flutter
+- Dart
+- Dio
+- Provider
+- ChangeNotifier
+- GoRouter
+- API REST
 
-## 3. Tecnologías utilizadas
+## Arquitectura del proyecto
 
-- Flutter.
-- Dart.
-- Dio: cliente HTTP para consumir la API.
-- Provider: gestión de estados.
-- GoRouter: navegación entre pantallas.
-- JSONPlaceholder: servicio de API REST.
-- Android Studio / Visual Studio Code.
-
-## 4. API REST utilizada
-
-Se utilizó JSONPlaceholder como fuente de datos de prueba.
-
-**URL del servicio:**
-
-https://jsonplaceholder.typicode.com/todos?userId=1
-
-**Método HTTP:** GET.
-
-La API devuelve 20 tareas correspondientes al usuario con ID 1.
-
-Los datos recibidos incluyen:
-
-- userId: identificador del usuario.
-- id: identificador de la tarea.
-- title: título de la tarea.
-- completed: estado de finalización.
-
-Los campos de descripción y prioridad se completan con valores predeterminados porque no están incluidos en esta API.
-
-## 5. Arquitectura del proyecto
-
-El proyecto utiliza el patrón arquitectónico MVVM:
-
-- Model: representa los datos de las tareas mediante la clase Task.
-- View: presenta la información en las pantallas de listado y detalle.
-- ViewModel: administra el estado, la carga de tareas y las acciones del usuario.
-- Repository: abstrae el origen de los datos.
-- API Service: realiza las peticiones HTTP al servidor.
-
-## 6. Estructura de carpetas
+El proyecto utiliza la siguiente estructura:
 
 ```text
 lib/
-├── main.dart
-├── app/
-│   └── taskflow_app.dart
-├── core/
-│   └── app_theme.dart
-└── features/
-    └── tasks/
-        ├── data/
-        │   ├── local_task_repository.dart
-        │   ├── remote_task_repository.dart
-        │   ├── task_api_service.dart
-        │   └── task_repository.dart
-        ├── domain/
-        │   └── task.dart
-        └── presentation/
-            ├── task_detail_screen.dart
-            ├── task_list_screen.dart
-            └── tasks_view_model.dart
+├── features/
+│   └── tasks/
+│       ├── data/
+│       │   ├── task_api_service.dart
+│       │   └── task_repository.dart
+│       ├── domain/
+│       │   └── task.dart
+│       └── presentation/
+│           ├── tasks_view_model.dart
+│           └── task_list_screen.dart
 ```
 
-## 7. Funcionalidades implementadas
+### Responsabilidades
 
-1. Consulta de tareas desde una API REST.
-2. Visualización de las tareas recibidas.
-3. Indicador de carga durante la petición.
-4. Manejo de errores de conexión.
-5. Botón para reintentar la carga.
-6. Navegación desde el listado hacia el detalle.
-7. Visualización de los datos de cada tarea.
-8. Cambio del estado de una tarea entre completada y pendiente.
+- **Service:** realiza las solicitudes HTTP mediante Dio.
+- **Repository:** administra el acceso a los datos.
+- **ViewModel:** controla los estados y la lógica de las tareas.
+- **View:** muestra la información y permite interactuar con el usuario.
 
-**Nota:** Los cambios de estado se mantienen en memoria durante la ejecución de la aplicación. JSONPlaceholder no almacena las modificaciones realizadas por esta aplicación.
+## Funcionalidades implementadas – Sesión 8
 
-## 8. Configuración y ejecución
+Se implementaron cuatro estados principales:
 
-### Requisitos
+### 1. Estado de carga
 
-- Flutter instalado.
-- Dart instalado.
-- Android Studio o Visual Studio Code.
-- Dispositivo Android o emulador.
+Mientras se realiza la petición al servidor, se muestra un indicador circular mediante `CircularProgressIndicator`.
 
-### Instalar dependencias
+### 2. Estado de éxito
+
+Cuando la API responde correctamente y contiene tareas, se muestra una lista de tarjetas con:
+
+- Título de la tarea.
+- Prioridad.
+- Estado de completada.
+- Acceso al detalle de cada tarea.
+
+### 3. Estado vacío
+
+Cuando la API responde correctamente, pero no existen tareas, se muestra el mensaje:
+
+"Todavía no hay tareas para mostrar."
+
+También se incorpora el botón **Actualizar** para realizar una nueva consulta.
+
+### 4. Estado de error
+
+Cuando ocurre un problema de conexión o falla la solicitud, se muestra el mensaje:
+
+"No se pudieron cargar las tareas."
+
+Se incorpora el botón **Reintentar**, que permite volver a consultar la API sin reiniciar la aplicación.
+
+## Actualización de tareas
+
+Se implementaron dos formas de actualizar la información:
+
+- Botón de actualización ubicado en la barra superior.
+- Gesto de deslizar hacia abajo mediante `RefreshIndicator`.
+
+La función `loadTasks()` permite realizar nuevamente la consulta al servidor.
+
+## Gestión de estados
+
+En `tasks_view_model.dart` se utilizan:
+
+- `isLoading`: indica si se están cargando las tareas.
+- `errorMessage`: almacena el mensaje de error.
+- `isEmpty`: identifica si la respuesta contiene una lista vacía.
+- `notifyListeners()`: notifica los cambios a la interfaz.
+- `try`, `catch` y `finally`: controlan la operación asíncrona.
+
+En `task_list_screen.dart` se utilizan:
+
+- `context.watch`: observa los cambios del ViewModel.
+- `context.read`: ejecuta acciones sin crear una escucha adicional.
+
+## Pruebas realizadas
+
+Se contemplan las siguientes pruebas para verificar el funcionamiento:
+
+| Prueba | Procedimiento | Resultado esperado |
+|---|---|---|
+| Éxito | Conectar a internet y abrir TaskFlow. | Mostrar las tareas recibidas. |
+| Carga | Observar la consulta al servidor. | Mostrar el indicador circular. |
+| Vacío | Cambiar temporalmente `userId` a `9999`. | Mostrar el mensaje de lista vacía. |
+| Error | Desactivar internet y actualizar. | Mostrar el mensaje de error. |
+| Reintento | Reactivar internet y pulsar Reintentar. | Recuperar las tareas sin reiniciar la aplicación. |
+
+**Importante:** después de realizar la prueba de lista vacía, se debe restaurar el valor original de `userId`.
+
+## Instalación y ejecución
+
+Para ejecutar el proyecto, abrir una terminal en la carpeta raíz y utilizar los siguientes comandos:
 
 ```bash
 flutter pub get
 ```
 
-### Analizar el proyecto
+Para formatear el código:
+
+```bash
+dart format lib
+```
+
+Para comprobar posibles errores:
 
 ```bash
 flutter analyze
 ```
 
-### Ejecutar la aplicación
+Para ejecutar la aplicación:
 
 ```bash
 flutter run
 ```
 
-## 9. Permiso de conexión a internet
+## Evidencias de la sesión 8
 
-Para permitir que la aplicación realice peticiones HTTP, se agregó el siguiente permiso en `android/app/src/main/AndroidManifest.xml`, antes de la etiqueta `<application>`:
+Se deben incluir capturas de pantalla que demuestren:
 
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
+1. Lista de tareas cargada correctamente.
+2. Indicador de carga.
+3. Mensaje cuando no existen tareas.
+4. Mensaje de error cuando no hay conexión.
+5. Recuperación de las tareas utilizando el botón Reintentar.
 
-## 10. Pruebas realizadas
+## Conclusión
 
-Se realizaron las siguientes comprobaciones:
+En la sesión 8 se mejoró la aplicación TaskFlow mediante la implementación de estados asíncronos para controlar las solicitudes a la API REST.
 
-- Instalación de dependencias mediante `flutter pub get`.
-- Formateo del código con `dart format`.
-- Análisis estático mediante `flutter analyze`.
-- Compilación e instalación en un dispositivo Android Infinix X6531.
-- Consulta de la API REST.
-- Verificación de respuesta HTTP 200.
-- Comprobación de la navegación entre listado y detalle.
+La aplicación ahora diferencia entre carga, éxito, vacío y error, permitiendo al usuario actualizar la información y recuperar una consulta fallida mediante el botón Reintentar, sin necesidad de reiniciar la aplicación.
 
-**Resultado de la conexión:**
+Se conserva la navegación al detalle de las tareas y la organización de la arquitectura implementada en las sesiones anteriores.
 
-```text
-GET /todos?userId=1 → HTTP 200
-```
-
-La API respondió correctamente y la aplicación pudo conectarse al servicio remoto.
-
-## 11. Conclusión
-
-Durante el desarrollo de esta sesión se implementó el consumo de una API REST en Flutter utilizando Dio. Se integró la obtención de tareas con la arquitectura MVVM y Provider, permitiendo administrar los estados de carga, error y visualización de información.
-
-También se implementó la navegación entre el listado de tareas y sus detalles mediante GoRouter.
-
-Esta práctica permitió comprender cómo conectar una aplicación móvil con servicios web externos y organizar el código mediante una arquitectura escalable y mantenible.
-
-## 12. Autor
+---
 
 **Proyecto:** TaskFlow  
-**Desarrollador:** Eduardo García Flores  
-**Asignatura:** Desarrollo de aplicaciones móviles  
-**Repositorio:** https://github.com/eagf123/taskflow
+**Sesión:** 8 – Mostrar carga, datos, vacío y error  
+**Tecnología:** Flutter y Dart
