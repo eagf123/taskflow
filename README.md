@@ -1,163 +1,171 @@
-# TaskFlow – Gestión de Tareas
 
-## Descripción del proyecto
+# TaskFlow
 
-TaskFlow es una aplicación móvil desarrollada con Flutter que permite consultar y visualizar tareas mediante una API REST. La aplicación utiliza una arquitectura organizada en Service, Repository, ViewModel y View para separar las responsabilidades y facilitar el mantenimiento del código.
+Aplicación móvil desarrollada con Flutter para gestionar y visualizar tareas mediante una API REST.
 
-En esta sesión se implementaron los estados de carga, éxito, vacío y error, además de la funcionalidad para reintentar una consulta cuando ocurre un problema de conexión.
+## Información del proyecto
 
-## Tecnologías utilizadas
+- **Proyecto:** TaskFlow
+- **Actividad:** CODELAB 09
+- **Semana:** 5
+- **Tema:** Crear un formulario de tareas
+- **Tecnología:** Flutter y Dart
+- **Navegación:** GoRouter
+- **Gestión de estado:** Provider
+- **Conexión:** API REST mediante Dio
 
-- Flutter
-- Dart
-- Dio
-- Provider
-- ChangeNotifier
-- GoRouter
-- API REST
+## Objetivo
 
-## Arquitectura del proyecto
+Implementar un formulario para preparar nuevas tareas, validando el título, la descripción y la prioridad antes de devolver los datos a la pantalla principal.
 
-El proyecto utiliza la siguiente estructura:
+## Funcionalidades implementadas
+
+### 1. Listado de tareas
+
+- Visualización de tareas obtenidas desde una API REST.
+- Indicador de carga.
+- Mensaje de error y opción para reintentar.
+- Actualización de tareas mediante el botón de refrescar.
+- Actualización mediante RefreshIndicator.
+
+### 2. Detalle de tareas
+
+- Navegación al detalle mediante el identificador de cada tarea.
+- Visualización de la información correspondiente a la tarea seleccionada.
+
+### 3. Formulario de nuevas tareas
+
+Se creó la pantalla `TaskFormScreen` para preparar nuevas tareas.
+
+Características:
+
+- Campo de título.
+- Campo de descripción.
+- Selector de prioridad.
+- Botón Guardar tarea.
+- Botón Cancelar.
+- Validación de campos.
+
+### 4. Validaciones del formulario
+
+| Campo | Validación |
+|---|---|
+| Título | Obligatorio |
+| Título | Mínimo 3 caracteres |
+| Descripción | Obligatoria |
+| Prioridad | Selección de Alta, Media o Baja |
+
+### 5. Controladores y estado
+
+Se implementaron:
+
+- `GlobalKey<FormState>` para validar el formulario.
+- `TextEditingController` para controlar el título y la descripción.
+- `dispose()` para liberar los controladores.
+- `StatefulWidget` para administrar la prioridad seleccionada.
+- `TaskDraft` para representar temporalmente los datos del formulario.
+
+### 6. Navegación
+
+Se utiliza GoRouter con las siguientes rutas:
+
+| Ruta | Pantalla |
+|---|---|
+| `/` | Listado de tareas |
+| `/task/:id` | Detalle de una tarea |
+| `/new` | Formulario de nueva tarea |
+
+Al guardar un formulario válido, se utiliza `context.pop(draft)` para devolver los datos a la pantalla anterior.
+
+La pantalla principal muestra el mensaje:
+
+`Formulario válido: nombre de la tarea`
+
+**Nota:** El formulario todavía no envía información a la API REST. La integración mediante POST corresponde a la siguiente sesión.
+
+## Estructura del proyecto
 
 ```text
 lib/
+├── app/
+│   └── taskflow_app.dart
+├── core/
+│   └── app_theme.dart
 ├── features/
 │   └── tasks/
 │       ├── data/
+│       │   ├── local_task_repository.dart
+│       │   ├── remote_task_repository.dart
 │       │   ├── task_api_service.dart
 │       │   └── task_repository.dart
 │       ├── domain/
 │       │   └── task.dart
 │       └── presentation/
-│           ├── tasks_view_model.dart
-│           └── task_list_screen.dart
+│           ├── task_detail_screen.dart
+│           ├── task_form_screen.dart
+│           ├── task_list_screen.dart
+│           └── tasks_view_model.dart
+└── main.dart
 ```
 
-### Responsabilidades
+## Dependencias principales
 
-- **Service:** realiza las solicitudes HTTP mediante Dio.
-- **Repository:** administra el acceso a los datos.
-- **ViewModel:** controla los estados y la lógica de las tareas.
-- **View:** muestra la información y permite interactuar con el usuario.
-
-## Funcionalidades implementadas – Sesión 8
-
-Se implementaron cuatro estados principales:
-
-### 1. Estado de carga
-
-Mientras se realiza la petición al servidor, se muestra un indicador circular mediante `CircularProgressIndicator`.
-
-### 2. Estado de éxito
-
-Cuando la API responde correctamente y contiene tareas, se muestra una lista de tarjetas con:
-
-- Título de la tarea.
-- Prioridad.
-- Estado de completada.
-- Acceso al detalle de cada tarea.
-
-### 3. Estado vacío
-
-Cuando la API responde correctamente, pero no existen tareas, se muestra el mensaje:
-
-"Todavía no hay tareas para mostrar."
-
-También se incorpora el botón **Actualizar** para realizar una nueva consulta.
-
-### 4. Estado de error
-
-Cuando ocurre un problema de conexión o falla la solicitud, se muestra el mensaje:
-
-"No se pudieron cargar las tareas."
-
-Se incorpora el botón **Reintentar**, que permite volver a consultar la API sin reiniciar la aplicación.
-
-## Actualización de tareas
-
-Se implementaron dos formas de actualizar la información:
-
-- Botón de actualización ubicado en la barra superior.
-- Gesto de deslizar hacia abajo mediante `RefreshIndicator`.
-
-La función `loadTasks()` permite realizar nuevamente la consulta al servidor.
-
-## Gestión de estados
-
-En `tasks_view_model.dart` se utilizan:
-
-- `isLoading`: indica si se están cargando las tareas.
-- `errorMessage`: almacena el mensaje de error.
-- `isEmpty`: identifica si la respuesta contiene una lista vacía.
-- `notifyListeners()`: notifica los cambios a la interfaz.
-- `try`, `catch` y `finally`: controlan la operación asíncrona.
-
-En `task_list_screen.dart` se utilizan:
-
-- `context.watch`: observa los cambios del ViewModel.
-- `context.read`: ejecuta acciones sin crear una escucha adicional.
-
-## Pruebas realizadas
-
-Se contemplan las siguientes pruebas para verificar el funcionamiento:
-
-| Prueba | Procedimiento | Resultado esperado |
-|---|---|---|
-| Éxito | Conectar a internet y abrir TaskFlow. | Mostrar las tareas recibidas. |
-| Carga | Observar la consulta al servidor. | Mostrar el indicador circular. |
-| Vacío | Cambiar temporalmente `userId` a `9999`. | Mostrar el mensaje de lista vacía. |
-| Error | Desactivar internet y actualizar. | Mostrar el mensaje de error. |
-| Reintento | Reactivar internet y pulsar Reintentar. | Recuperar las tareas sin reiniciar la aplicación. |
-
-**Importante:** después de realizar la prueba de lista vacía, se debe restaurar el valor original de `userId`.
+- Flutter
+- Provider
+- GoRouter
+- Dio
 
 ## Instalación y ejecución
 
-Para ejecutar el proyecto, abrir una terminal en la carpeta raíz y utilizar los siguientes comandos:
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/eagf123/taskflow.git
+```
+
+Ingresar al proyecto:
+
+```bash
+cd taskflow
+```
+
+Instalar dependencias:
 
 ```bash
 flutter pub get
 ```
 
-Para formatear el código:
-
-```bash
-dart format lib
-```
-
-Para comprobar posibles errores:
+Verificar el código:
 
 ```bash
 flutter analyze
 ```
 
-Para ejecutar la aplicación:
+Ejecutar la aplicación:
 
 ```bash
 flutter run
 ```
 
-## Evidencias de la sesión 8
+## Pruebas del CODELAB 09
 
-Se deben incluir capturas de pantalla que demuestren:
+Comprobar los siguientes casos:
 
-1. Lista de tareas cargada correctamente.
-2. Indicador de carga.
-3. Mensaje cuando no existen tareas.
-4. Mensaje de error cuando no hay conexión.
-5. Recuperación de las tareas utilizando el botón Reintentar.
+1. Abrir el listado de tareas.
+2. Presionar el botón Nueva tarea.
+3. Intentar guardar el formulario vacío.
+4. Comprobar la validación del título.
+5. Ingresar un título de dos caracteres.
+6. Comprobar la validación de la descripción.
+7. Seleccionar una prioridad.
+8. Completar todos los campos y guardar.
+9. Verificar el mensaje de retorno del borrador.
+10. Comprobar que el detalle de las tareas continúa funcionando.
 
-## Conclusión
+## Próxima actividad
 
-En la sesión 8 se mejoró la aplicación TaskFlow mediante la implementación de estados asíncronos para controlar las solicitudes a la API REST.
+En la siguiente sesión se conectará el formulario con la API REST mediante una petición POST para registrar nuevas tareas en el servidor.
 
-La aplicación ahora diferencia entre carga, éxito, vacío y error, permitiendo al usuario actualizar la información y recuperar una consulta fallida mediante el botón Reintentar, sin necesidad de reiniciar la aplicación.
+## Autor
 
-Se conserva la navegación al detalle de las tareas y la organización de la arquitectura implementada en las sesiones anteriores.
-
----
-
-**Proyecto:** TaskFlow  
-**Sesión:** 8 – Mostrar carga, datos, vacío y error  
-**Tecnología:** Flutter y Dart
+Eduardo García Flores
