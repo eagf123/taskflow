@@ -1,119 +1,144 @@
-
 # TaskFlow
 
-Aplicación móvil desarrollada con Flutter para gestionar y visualizar tareas mediante una API REST.
+Aplicación móvil desarrollada con Flutter para gestionar tareas, consultar información desde una API REST y realizar operaciones de creación, actualización y eliminación.
 
-## Información del proyecto
+## Descripción del proyecto
 
-- **Proyecto:** TaskFlow
-- **Actividad:** CODELAB 09
-- **Semana:** 5
-- **Tema:** Crear un formulario de tareas
-- **Tecnología:** Flutter y Dart
-- **Navegación:** GoRouter
-- **Gestión de estado:** Provider
-- **Conexión:** API REST mediante Dio
+TaskFlow permite visualizar tareas, consultar sus detalles, crear nuevas actividades, editar títulos y eliminar tareas mediante solicitudes HTTP.
 
-## Objetivo
+El proyecto utiliza una arquitectura basada en Repository y ViewModel, separando la lógica de negocio, el acceso a datos y la interfaz de usuario.
 
-Implementar un formulario para preparar nuevas tareas, validando el título, la descripción y la prioridad antes de devolver los datos a la pantalla principal.
+## Tecnologías utilizadas
 
-## Funcionalidades implementadas
+- Flutter
+- Dart
+- Android Studio
+- Visual Studio Code
+- Dio
+- Provider
+- GoRouter
+- JSONPlaceholder
+- Git y GitHub
 
-### 1. Listado de tareas
-
-- Visualización de tareas obtenidas desde una API REST.
-- Indicador de carga.
-- Mensaje de error y opción para reintentar.
-- Actualización de tareas mediante el botón de refrescar.
-- Actualización mediante RefreshIndicator.
-
-### 2. Detalle de tareas
-
-- Navegación al detalle mediante el identificador de cada tarea.
-- Visualización de la información correspondiente a la tarea seleccionada.
-
-### 3. Formulario de nuevas tareas
-
-Se creó la pantalla `TaskFormScreen` para preparar nuevas tareas.
-
-Características:
-
-- Campo de título.
-- Campo de descripción.
-- Selector de prioridad.
-- Botón Guardar tarea.
-- Botón Cancelar.
-- Validación de campos.
-
-### 4. Validaciones del formulario
-
-| Campo | Validación |
-|---|---|
-| Título | Obligatorio |
-| Título | Mínimo 3 caracteres |
-| Descripción | Obligatoria |
-| Prioridad | Selección de Alta, Media o Baja |
-
-### 5. Controladores y estado
-
-Se implementaron:
-
-- `GlobalKey<FormState>` para validar el formulario.
-- `TextEditingController` para controlar el título y la descripción.
-- `dispose()` para liberar los controladores.
-- `StatefulWidget` para administrar la prioridad seleccionada.
-- `TaskDraft` para representar temporalmente los datos del formulario.
-
-### 6. Navegación
-
-Se utiliza GoRouter con las siguientes rutas:
-
-| Ruta | Pantalla |
-|---|---|
-| `/` | Listado de tareas |
-| `/task/:id` | Detalle de una tarea |
-| `/new` | Formulario de nueva tarea |
-
-Al guardar un formulario válido, se utiliza `context.pop(draft)` para devolver los datos a la pantalla anterior.
-
-La pantalla principal muestra el mensaje:
-
-`Formulario válido: nombre de la tarea`
-
-**Nota:** El formulario todavía no envía información a la API REST. La integración mediante POST corresponde a la siguiente sesión.
-
-## Estructura del proyecto
+## Arquitectura del proyecto
 
 ```text
 lib/
+├── main.dart
 ├── app/
 │   └── taskflow_app.dart
 ├── core/
 │   └── app_theme.dart
-├── features/
-│   └── tasks/
-│       ├── data/
-│       │   ├── local_task_repository.dart
-│       │   ├── remote_task_repository.dart
-│       │   ├── task_api_service.dart
-│       │   └── task_repository.dart
-│       ├── domain/
-│       │   └── task.dart
-│       └── presentation/
-│           ├── task_detail_screen.dart
-│           ├── task_form_screen.dart
-│           ├── task_list_screen.dart
-│           └── tasks_view_model.dart
-└── main.dart
+└── features/
+    └── tasks/
+        ├── data/
+        │   ├── local_task_repository.dart
+        │   ├── task_repository.dart
+        │   ├── task_api_service.dart
+        │   └── remote_task_repository.dart
+        ├── domain/
+        │   └── task.dart
+        └── presentation/
+            ├── tasks_view_model.dart
+            ├── task_list_screen.dart
+            ├── task_detail_screen.dart
+            └── task_form_screen.dart
 ```
 
-## Dependencias principales
+## Funcionalidades implementadas
 
-- Flutter
-- Provider
-- GoRouter
-- Dio
+### Sesiones anteriores
+
+- Pantalla de bienvenida de TaskFlow.
+- Modelo de datos Task.
+- Listado de tareas.
+- Repositorio local.
+- Navegación mediante GoRouter.
+- Pantalla de detalle de tareas.
+- Conexión con API REST.
+- Consulta de tareas mediante GET.
+- Manejo de estados de carga y errores.
+- Formulario para registrar nuevas tareas.
+- Validación del título, descripción y prioridad.
+
+### Sesión 10: Enviar cambios con POST, PATCH y DELETE
+
+Se implementaron las tres operaciones HTTP para gestionar las tareas.
+
+**1. POST – Crear tareas**
+
+- Permite registrar nuevas tareas desde el formulario.
+- Envía el título, estado de finalización e identificador del usuario.
+- Conserva localmente la descripción y prioridad.
+- Agrega la tarea al listado después de recibir una respuesta correcta.
+- Muestra un mensaje de confirmación mediante SnackBar.
+
+**2. PATCH – Actualizar tareas**
+
+- Permite editar el título de una tarea.
+- Valida que el título tenga al menos tres caracteres.
+- Envía los cambios a la API.
+- Actualiza el listado después de recibir una respuesta correcta.
+- Muestra mensajes de éxito o error.
+
+**3. DELETE – Eliminar tareas**
+
+- Permite eliminar tareas desde la pantalla de detalle.
+- Solicita confirmación mediante un AlertDialog.
+- Permite cancelar la operación.
+- Envía la solicitud DELETE a la API.
+- Actualiza el listado después de recibir una respuesta correcta.
+
+## API REST utilizada
+
+Se utiliza JSONPlaceholder como servicio de práctica.
+
+URL base:
+
+https://jsonplaceholder.typicode.com
+
+Endpoints implementados:
+
+| Método HTTP | Endpoint | Descripción |
+|---|---|---|
+| GET | /todos?userId=1 | Consultar tareas |
+| POST | /todos | Crear una tarea |
+| PATCH | /todos/{id} | Actualizar una tarea |
+| DELETE | /todos/{id} | Eliminar una tarea |
+
+## Modelo de datos
+
+La clase Task contiene los siguientes atributos:
+
+- id: identificador de la tarea.
+- title: título de la tarea.
+- description: descripción.
+- priority: prioridad.
+- isCompleted: estado de finalización.
+- userId: identificador del usuario.
+
+También incorpora los métodos `fromJson` y `copyWith` para convertir datos JSON y crear copias modificadas de las tareas.
+
+## Manejo de estados
+
+La aplicación utiliza Provider y ChangeNotifier para administrar los estados de la interfaz.
+
+Se contemplan los siguientes estados:
+
+- Cargando información.
+- Datos disponibles.
+- Lista vacía.
+- Error al consultar la API.
+
+Las operaciones de escritura esperan la respuesta HTTP antes de actualizar la lista local o mostrar un mensaje de éxito.
+
+## Limitación de JSONPlaceholder
+
+JSONPlaceholder simula las operaciones POST, PATCH y DELETE.
+
+Las respuestas permiten practicar la comunicación HTTP, pero los cambios no se guardan permanentemente en el servidor.
+
+Por esta razón, después de reiniciar la aplicación o volver a consultar la API, pueden reaparecer los datos originales.
 
 ## Instalación y ejecución
 
@@ -123,7 +148,7 @@ Clonar el repositorio:
 git clone https://github.com/eagf123/taskflow.git
 ```
 
-Ingresar al proyecto:
+Entrar en la carpeta:
 
 ```bash
 cd taskflow
@@ -135,7 +160,7 @@ Instalar dependencias:
 flutter pub get
 ```
 
-Verificar el código:
+Analizar el proyecto:
 
 ```bash
 flutter analyze
@@ -147,25 +172,40 @@ Ejecutar la aplicación:
 flutter run
 ```
 
-## Pruebas del CODELAB 09
+## Comprobación de funcionamiento
 
-Comprobar los siguientes casos:
+Para verificar las funcionalidades implementadas:
 
-1. Abrir el listado de tareas.
-2. Presionar el botón Nueva tarea.
-3. Intentar guardar el formulario vacío.
-4. Comprobar la validación del título.
-5. Ingresar un título de dos caracteres.
-6. Comprobar la validación de la descripción.
-7. Seleccionar una prioridad.
-8. Completar todos los campos y guardar.
-9. Verificar el mensaje de retorno del borrador.
-10. Comprobar que el detalle de las tareas continúa funcionando.
+1. Abrir la aplicación TaskFlow.
+2. Consultar el listado de tareas.
+3. Crear una nueva tarea.
+4. Comprobar que aparece en el listado.
+5. Abrir el detalle de una tarea.
+6. Editar el título.
+7. Comprobar la actualización.
+8. Intentar eliminar una tarea.
+9. Comprobar el diálogo de confirmación.
+10. Confirmar la eliminación y verificar que desaparece del listado.
 
-## Próxima actividad
+## Formateo y análisis
 
-En la siguiente sesión se conectará el formulario con la API REST mediante una petición POST para registrar nuevas tareas en el servidor.
+Antes de subir los cambios, ejecutar:
 
-## Autor
+```bash
+dart format lib
+flutter pub get
+flutter analyze
+```
 
-Eduardo García Flores
+## Control de versiones
+
+Repositorio GitHub:
+
+https://github.com/eagf123/taskflow
+
+Comandos para guardar y subir los cambios:
+
+```bash
+git status
+git add README.md lib test pubspec.yaml pubspec.lock
+git commit -m "feat: completar CRUD de tareas

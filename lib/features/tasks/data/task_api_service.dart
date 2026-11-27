@@ -17,6 +17,7 @@ class TaskApiService {
 
   final Dio _dio;
 
+  // GET: Obtener todas las tareas.
   Future<List<Task>> getTasks() async {
     final response = await _dio.get<List<dynamic>>(
       '/todos',
@@ -35,5 +36,40 @@ class TaskApiService {
       final json = Map<String, dynamic>.from(row as Map);
       return Task.fromJson(json);
     }).toList();
+  }
+
+  // POST: Crear una tarea.
+  Future<Task> createTask(String title) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/todos',
+      data: {'title': title, 'completed': false, 'userId': userId},
+    );
+
+    debugPrint('POST /todos → HTTP ${response.statusCode}');
+
+    final json = response.data;
+
+    if (json == null) {
+      throw const FormatException('Respuesta vacía.');
+    }
+
+    return Task.fromJson(json);
+  }
+
+  // PATCH: Actualizar una tarea.
+  Future<void> updateTask(Task task) async {
+    final response = await _dio.patch(
+      '/todos/${task.id}',
+      data: {'title': task.title, 'completed': task.isCompleted},
+    );
+
+    debugPrint('PATCH /todos/${task.id} → HTTP ${response.statusCode}');
+  }
+
+  // DELETE: Eliminar una tarea.
+  Future<void> deleteTask(int id) async {
+    final response = await _dio.delete('/todos/$id');
+
+    debugPrint('DELETE /todos/$id → HTTP ${response.statusCode}');
   }
 }

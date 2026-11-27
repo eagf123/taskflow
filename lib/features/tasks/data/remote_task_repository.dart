@@ -24,4 +24,43 @@ class RemoteTaskRepository implements TaskRepository {
 
     _tasks[index] = task;
   }
+
+  // POST: Crear una tarea.
+  @override
+  Future<Task> createTask(
+    String title,
+    String description,
+    String priority,
+  ) async {
+    final response = await _apiService.createTask(title);
+
+    final task = Task(
+      id: response.id,
+      title: title,
+      description: description,
+      priority: priority,
+      isCompleted: false,
+      userId: response.userId,
+    );
+
+    _tasks = [..._tasks, task];
+
+    return task;
+  }
+
+  // PATCH: Actualizar una tarea.
+  @override
+  Future<void> updateTask(Task task) async {
+    await _apiService.updateTask(task);
+
+    save(task);
+  }
+
+  // DELETE: Eliminar una tarea.
+  @override
+  Future<void> deleteTask(int id) async {
+    await _apiService.deleteTask(id);
+
+    _tasks = _tasks.where((task) => task.id != id).toList();
+  }
 }

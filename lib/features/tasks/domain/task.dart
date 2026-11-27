@@ -15,10 +15,11 @@ class Task {
   final bool isCompleted;
   final int userId;
 
-  Task copyWith({bool? isCompleted}) {
+  // Crear una copia modificando el título o el estado.
+  Task copyWith({String? title, bool? isCompleted}) {
     return Task(
       id: id,
-      title: title,
+      title: title ?? this.title,
       description: description,
       priority: priority,
       isCompleted: isCompleted ?? this.isCompleted,
@@ -26,6 +27,7 @@ class Task {
     );
   }
 
+  // Convertir JSON en una tarea.
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: json['id'] as int,
